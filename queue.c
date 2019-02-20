@@ -64,7 +64,7 @@ bool q_insert_head(queue_t *q, char *s)
         size_t length;
 
         if (newh != NULL) {
-            length = strlen(s) + 1;
+            length = strlen(s) + 1;  // +1 for NULL byte
             newh->value = (char *) malloc(length * sizeof(char));
             if (newh->value != NULL) {
                 memcpy(newh->value, s, length);
@@ -102,7 +102,7 @@ bool q_insert_tail(queue_t *q, char *s)
         size_t length;
 
         if (new_node != NULL) {
-            length = strlen(s) + 1;
+            length = strlen(s) + 1;  // +1 for NULL byte
             new_node->value = (char *) malloc(length * sizeof(char));
             if (new_node->value != NULL) {
                 memcpy(new_node->value, s, length);
@@ -143,7 +143,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
         }
 
         if (sp != NULL) {
-            memcpy(sp, ptr->value, bufsize - 1);
+            strncpy(sp, ptr->value, bufsize - 1);
             sp[bufsize - 1] = '\0';
         }
         free(ptr->value);
