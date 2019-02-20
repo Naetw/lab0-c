@@ -58,14 +58,29 @@ void q_free(queue_t *q)
  */
 bool q_insert_head(queue_t *q, char *s)
 {
-    list_ele_t *newh;
-    /* What should you do if the q is NULL? */
-    newh = malloc(sizeof(list_ele_t));
-    /* Don't forget to allocate space for the string and copy it */
-    /* What if either call to malloc returns NULL? */
-    newh->next = q->head;
-    q->head = newh;
-    return true;
+    if (q != NULL) {
+        list_ele_t *newh = (list_ele_t *) malloc(sizeof(list_ele_t));
+        size_t length;
+
+        if (newh != NULL) {
+            length = strlen(s) + 1;
+            newh->value = (char *) malloc(length * sizeof(char));
+            if (newh->value != NULL) {
+                memcpy(newh->value, s, length);
+                newh->next = q->head;
+                q->head = newh;
+                ++q->size;
+                return true;
+            } else {
+                free(newh);
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
 
 
@@ -93,9 +108,24 @@ bool q_insert_tail(queue_t *q, char *s)
 */
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
-    /* You need to fix up this code. */
-    q->head = q->head->next;
-    return true;
+    if (q != NULL && q->size != 0) {
+        list_ele_t *ptr;
+
+        ptr = q->head;
+        q->head = q->head->next;
+        --q->size;
+
+        if (sp != NULL) {
+            memcpy(sp, ptr->value, bufsize - 1);
+            sp[bufsize - 1] = '\0';
+        }
+        free(ptr->value);
+        free(ptr);
+
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /*
