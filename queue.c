@@ -50,6 +50,30 @@ void q_free(queue_t *q)
     }
 }
 
+list_ele_t *q_insert_prologue(queue_t *q, char *s)
+{
+    if (q != NULL) {
+        list_ele_t *new_node = (list_ele_t *) malloc(sizeof(list_ele_t));
+        size_t length;
+
+        if (new_node != NULL) {
+            length = strlen(s) + 1;  // +1 for NULL byte
+            new_node->value = (char *) malloc(length * sizeof(char));
+            if (new_node->value != NULL) {
+                memcpy(new_node->value, s, length);
+                return new_node;
+            } else {
+                free(new_node);
+                return NULL;
+            }
+        } else {
+            return NULL;
+        }
+    } else {
+        return NULL;
+    }
+}
+
 /*
   Attempt to insert element at head of queue.
   Return true if successful.
@@ -59,29 +83,15 @@ void q_free(queue_t *q)
  */
 bool q_insert_head(queue_t *q, char *s)
 {
-    if (q != NULL) {
-        list_ele_t *newh = (list_ele_t *) malloc(sizeof(list_ele_t));
-        size_t length;
-
-        if (newh != NULL) {
-            length = strlen(s) + 1;  // +1 for NULL byte
-            newh->value = (char *) malloc(length * sizeof(char));
-            if (newh->value != NULL) {
-                memcpy(newh->value, s, length);
-                newh->next = q->head;
-                q->head = newh;
-                if (q->size == 0) {
-                    q->tail = &newh->next;
-                }
-                ++q->size;
-                return true;
-            } else {
-                free(newh);
-                return false;
-            }
-        } else {
-            return false;
+    list_ele_t *new_node;
+    if ((new_node = q_insert_prologue(q, s)) != NULL) {
+        new_node->next = q->head;
+        q->head = new_node;
+        if (q->size == 0) {
+            q->tail = &new_node->next;
         }
+        ++q->size;
+        return true;
     } else {
         return false;
     }
@@ -97,27 +107,13 @@ bool q_insert_head(queue_t *q, char *s)
  */
 bool q_insert_tail(queue_t *q, char *s)
 {
-    if (q != NULL) {
-        list_ele_t *new_node = (list_ele_t *) malloc(sizeof(list_ele_t));
-        size_t length;
-
-        if (new_node != NULL) {
-            length = strlen(s) + 1;  // +1 for NULL byte
-            new_node->value = (char *) malloc(length * sizeof(char));
-            if (new_node->value != NULL) {
-                memcpy(new_node->value, s, length);
-                new_node->next = NULL;
-                *(q->tail) = new_node;
-                q->tail = &new_node->next;
-                ++q->size;
-                return true;
-            } else {
-                free(new_node);
-                return false;
-            }
-        } else {
-            return false;
-        }
+    list_ele_t *new_node;
+    if ((new_node = q_insert_prologue(q, s)) != NULL) {
+        new_node->next = NULL;
+        *(q->tail) = new_node;
+        q->tail = &new_node->next;
+        ++q->size;
+        return true;
     } else {
         return false;
     }
